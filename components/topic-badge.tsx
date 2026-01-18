@@ -15,10 +15,9 @@ export function TopicBadge({ topic }: TopicBadgeProps) {
     <Badge
       variant="outline"
       className={`
-        ${
-          topic.selected
-            ? "bg-[#1a8917] text-white hover:bg-[#157212]"
-            : "bg-[#f2f2f2] text-[#292929] hover:bg-[#e6e6e6]"
+        ${topic.selected
+          ? "bg-[#1a8917] text-white hover:bg-[#157212]"
+          : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
         } 
         border-none rounded-full px-4 py-1 cursor-pointer
       `}

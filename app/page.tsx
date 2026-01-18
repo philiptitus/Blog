@@ -3,12 +3,13 @@
 import Link from "next/link"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
-import { Bell, BookOpen, FileText, PenTool, Menu } from "lucide-react"
+import { Menu, ThumbsUp, Bookmark } from "lucide-react"
 import { useBlog } from "@/context/blog-context"
 import { ArticleCard } from "@/components/article-card"
 import { SearchBar } from "@/components/search-bar"
 import { TopicBadge } from "@/components/topic-badge"
 import { ArticleModal } from "@/components/article-modal"
+import { ModeToggle } from "@/components/mode-toggle"
 import {
   Dialog,
   DialogContent,
@@ -52,18 +53,18 @@ export default function HomePage() {
   )
 
   return (
-    <div className="flex min-h-screen bg-white">
+    <div className="flex min-h-screen bg-background">
       {/* Mobile Menu Button */}
       <button
-        className="fixed top-4 left-4 z-50 p-2 rounded-md bg-white shadow-md lg:hidden"
+        className="fixed top-4 left-4 z-50 p-2 rounded-md bg-background shadow-md lg:hidden"
         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
       >
-        <Menu className="w-6 h-6 text-[#757575]" />
+        <Menu className="w-6 h-6 text-muted-foreground" />
       </button>
 
       {/* Left Sidebar - Hidden on mobile by default */}
       <div className={cn(
-        "w-16 border-r border-[#e6e6e6] flex flex-col items-center py-4 fixed h-full bg-white z-40 transition-transform duration-300",
+        "w-16 border-r border-border flex flex-col items-center py-4 fixed h-full bg-background z-40 transition-transform duration-300",
         "lg:translate-x-0",
         isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
       )}>
@@ -77,18 +78,27 @@ export default function HomePage() {
               className="w-8 h-8"
             />
           </Link>
-          <Link href="#notifications" className="p-2 rounded-md hover:bg-[#f2f2f2]">
-            <Bell className="w-6 h-6 text-[#757575]" />
-          </Link>
-          <Link href="#reading-list" className="p-2 rounded-md hover:bg-[#f2f2f2]">
-            <BookOpen className="w-6 h-6 text-[#757575]" />
-          </Link>
-          <Link href="#stories" className="p-2 rounded-md hover:bg-[#f2f2f2]">
-            <FileText className="w-6 h-6 text-[#757575]" />
-          </Link>
-          <Link href="#write" className="p-2 rounded-md hover:bg-[#f2f2f2]">
-            <PenTool className="w-6 h-6 text-[#757575]" />
-          </Link>
+          <Button
+            variant="ghost"
+            size="icon"
+            className={cn("rounded-full mb-4", activeTab === "liked" ? "text-primary bg-muted" : "text-muted-foreground")}
+            onClick={() => setActiveTab("liked")}
+            title="Liked Posts"
+          >
+            <ThumbsUp className="w-6 h-6" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className={cn("rounded-full", activeTab === "following" ? "text-primary bg-muted" : "text-muted-foreground")}
+            onClick={() => setActiveTab("following")}
+            title="Saved Posts"
+          >
+            <Bookmark className="w-6 h-6" />
+          </Button>
+          <div className="pt-4 mt-4">
+            <ModeToggle />
+          </div>
         </div>
       </div>
 
@@ -104,30 +114,27 @@ export default function HomePage() {
               </div>
 
               {/* Tab Navigation */}
-              <div className="flex border-b border-[#e6e6e6] mb-6 overflow-x-auto">
+              <div className="flex border-b border-border mb-6 overflow-x-auto">
                 <Button
                   variant="ghost"
-                  className={`rounded-none pb-4 px-4 font-normal whitespace-nowrap ${
-                    activeTab === "following" ? "text-[#292929] border-b-2 border-[#292929]" : "text-[#757575]"
-                  }`}
+                  className={`rounded-none pb-4 px-4 font-normal whitespace-nowrap ${activeTab === "following" ? "text-foreground border-b-2 border-foreground" : "text-muted-foreground"
+                    }`}
                   onClick={() => setActiveTab("following")}
                 >
                   Following
                 </Button>
                 <Button
                   variant="ghost"
-                  className={`rounded-none pb-4 px-4 font-normal whitespace-nowrap ${
-                    activeTab === "popular" ? "text-[#292929] border-b-2 border-[#292929]" : "text-[#757575]"
-                  }`}
+                  className={`rounded-none pb-4 px-4 font-normal whitespace-nowrap ${activeTab === "popular" ? "text-foreground border-b-2 border-foreground" : "text-muted-foreground"
+                    }`}
                   onClick={() => setActiveTab("popular")}
                 >
                   Popular
                 </Button>
                 <Button
                   variant="ghost"
-                  className={`rounded-none pb-4 px-4 font-normal whitespace-nowrap ${
-                    activeTab === "liked" ? "text-[#292929] border-b-2 border-[#292929]" : "text-[#757575]"
-                  }`}
+                  className={`rounded-none pb-4 px-4 font-normal whitespace-nowrap ${activeTab === "liked" ? "text-foreground border-b-2 border-foreground" : "text-muted-foreground"
+                    }`}
                   onClick={() => setActiveTab("liked")}
                 >
                   Liked
@@ -149,7 +156,7 @@ export default function HomePage() {
                   ))
                 ) : (
                   <div className="text-center py-10">
-                    <p className="text-[#757575]">No articles found. Try adjusting your filters.</p>
+                    <p className="text-muted-foreground">No articles found. Try adjusting your filters.</p>
                   </div>
                 )}
               </div>
@@ -172,13 +179,10 @@ export default function HomePage() {
                   <div className="space-y-4">
                     {readingList.map((article) => (
                       <div key={article.id} className="flex flex-col space-y-2">
-                        <div 
-                          className="hover:text-[#1a8917] cursor-pointer"
-                          onClick={() => setSelectedArticle(article)}
-                        >
+                        <Link href={`/blog/${article.slug}`} className="hover:text-[#1a8917] cursor-pointer">
                           <h4 className="font-medium line-clamp-2">{article.name}</h4>
-                        </div>
-                        <div className="flex items-center space-x-2 text-sm text-[#757575]">
+                        </Link>
+                        <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                           <span>{article.author}</span>
                           <span>·</span>
                           <span>{new Date(article.timestamp).toLocaleDateString()}</span>
@@ -205,10 +209,10 @@ export default function HomePage() {
 
       {/* Article Modal */}
       {selectedArticle && (
-        <ArticleModal 
-          article={selectedArticle} 
-          isOpen={!!selectedArticle} 
-          onClose={() => setSelectedArticle(null)} 
+        <ArticleModal
+          article={selectedArticle}
+          isOpen={!!selectedArticle}
+          onClose={() => setSelectedArticle(null)}
         />
       )}
 

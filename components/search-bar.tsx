@@ -17,10 +17,10 @@ export function SearchBar() {
 
   return (
     <div className="relative">
-      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#757575] w-5 h-5" />
+      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
       <Input
         placeholder="Search"
-        className="pl-10 border border-[#e6e6e6] rounded-full bg-[#f2f2f2]"
+        className="pl-10 border border-border rounded-full bg-muted"
         value={value}
         onChange={(e) => setValue(e.target.value)}
       />
